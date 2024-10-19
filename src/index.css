@@ -2,14 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-.loginPage{
-    background-image: url('./assets/img/bg-image.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
+.loginPage,
+.signupPage {
+  background-image: url("./assets/img/bg-image.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    /* border: 2ppx solid red; */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* border: 2ppx solid red; */
 }

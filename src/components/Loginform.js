@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Loginform = ({ formType }) => {
   return (
@@ -60,13 +61,18 @@ const Loginform = ({ formType }) => {
           {formType === "signup" ? (
             <p>
               Already have an account?{" "}
-              <span className="font-bold">Sign In</span>
+              <Link to={"/"} className="font-bold">
+                Sign In
+              </Link>
             </p>
           ) : (
             <>
               <p className="text-center">Forgot Password?</p>
               <p>
-                New to FilmAI? <span className="font-bold">Sign up now</span>
+                New to FilmAI?{" "}
+                <Link to={"/signup"} className="font-bold">
+                  Sign up now
+                </Link>
               </p>
             </>
           )}
