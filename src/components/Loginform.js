@@ -1,25 +1,31 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   validateConfirmPassword,
   validateEmailOrPhone,
 } from "../utils/validate";
+import { createNewUser, signInUser } from "../utils/firebase";
 
 const LoginForm = ({ formType }) => {
   const emailRef = useRef("");
   const pwdRef = useRef("");
   const confirmPwdRef = useRef("");
+  const timeOutRef = useRef(null);
 
   const [errorMessage, setErrorMessage] = useState({
     email: "",
     password: "",
     confirmPassword: "",
+    db: "",
   });
 
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false); // Loading state
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {
+      ...errorMessage,
       email: validateEmailOrPhone(emailRef.current.value),
       password: !pwdRef.current.value ? "Please enter your password" : "",
       confirmPassword:
@@ -34,14 +40,57 @@ const LoginForm = ({ formType }) => {
     setErrorMessage(newErrors);
 
     // Only proceed if no errors exist
-    if (!newErrors.email && !newErrors.password && !newErrors.confirmPassword) {
-      // Submit the form data here
-      console.log("done");
+    if (
+      !errorMessage.email &&
+      !errorMessage.password &&
+      !errorMessage.confirmPassword
+    ) {
+      setLoading(true);
+      try {
+        if (formType === "signup") {
+          await createNewUser(emailRef.current.value, pwdRef.current.value);
+          emailRef.current.value = "";
+          pwdRef.current.value = "";
+          confirmPwdRef.current.value = "";
+          setErrorMessage({ email: "", password: "", confirmPassword: "" }); // Clear errors
+        } else {
+          await signInUser(emailRef.current.value, pwdRef.current.value);
+          emailRef.current.value = "";
+          pwdRef.current.value = "";
+          setErrorMessage({ email: "", password: "", confirmPassword: "" }); // Clear errors
+        }
+      } catch (error) {
+        console.error("Error creating user:", error.message);
+        setErrorMessage({
+          ...errorMessage,
+          db:
+            formType == "SignIn"
+              ? "Wrong email or password"
+              : "Something went wrong! try again later",
+        });
+        timeOutRef.current = setTimeout(() => {
+          setErrorMessage({
+            ...errorMessage,
+            db: "",
+          });
+        }, 2000);
+      } finally {
+        setLoading(false);
+      }
     }
   };
-
+  useEffect(() => {
+    return () => {
+      if (timeOutRef.current) {
+        clearTimeout(timeOutRef.current);
+      }
+    };
+  }, []);
   return (
-    <div className="max-w-[450px] w-full">
+    <div className="max-w-[450px] w-full bg-black/70 rounded">
+      <div className="w-full text-center text-red-500 p-3 absolute font-medium bg-black/70">
+        {errorMessage.db && errorMessage.db}
+      </div>
       <div className="formCon py-12 px-16 bg-black/70 rounded">
         <h2 className="text-3xl text-white font-bold mb-7">
           {formType === "signup" ? "Sign Up" : "Sign In"}
@@ -103,11 +152,19 @@ const LoginForm = ({ formType }) => {
           )}
 
           {/* Submit Button */}
-          <input
+          <button
             type="submit"
-            value={formType === "signup" ? "Sign Up" : "Sign In"}
-            className="w-full text-center py-2 bg-red-600 text-white rounded font-semibold"
-          />
+            disabled={loading} // Disable button while loading
+            className={`w-full text-center py-2 bg-red-600 text-white rounded font-semibold ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {loading
+              ? "Loading..."
+              : formType === "signup"
+              ? "Sign Up"
+              : "Sign In"}
+          </button>
         </form>
 
         {/* Footer Links */}
