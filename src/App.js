@@ -1,35 +1,43 @@
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router-dom";
-import Loginpage from "./page/Loginpage";
-import Signuppage from "./page/SIgnUp";
-import { Provider } from "react-redux";
-import store from './redux/store'
-const route = createBrowserRouter([
-  {
-    path: "/",
-    element: <Loginpage />,
-  },
-  {
-    path: "/signup",
-    element: <Signuppage />,
-  },
-  {
-    path: "*",
-    element: <Navigate to={"/"} />,
-  },
-]);
+import React, { useEffect, useState } from "react";
+import { RouterProvider } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { onAuthStateChanged } from "firebase/auth";
+import { removeUser, setUser } from "./utils/redux/userSlice";
+import { auth } from "./utils/firebase";
+import Loading from "./components/Loading";
+import PageRoutes from "./utils/route";
 
 function App() {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const formattedUser = {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+        };
+        dispatch(setUser(formattedUser));
+      } else {
+        dispatch(removeUser());
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [dispatch]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
-    <Provider store={store}>
-      <div className="App">
-      <RouterProvider router={route}></RouterProvider>
+    <div className="App">
+      <RouterProvider router={PageRoutes} />
     </div>
-    </Provider>
-    
   );
 }
 

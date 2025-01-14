@@ -1,17 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   validateConfirmPassword,
   validateEmailOrPhone,
 } from "../utils/validate";
 import { createNewUser, signInUser } from "../utils/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../utils/redux/userSlice";
 
 const LoginForm = ({ formType }) => {
+  const user = useSelector((state) => state.user);
   const emailRef = useRef("");
   const pwdRef = useRef("");
   const confirmPwdRef = useRef("");
   const timeOutRef = useRef(null);
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState({
     email: "",
     password: "",
@@ -20,7 +24,27 @@ const LoginForm = ({ formType }) => {
   });
 
   const [loading, setLoading] = useState(false); // Loading state
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user]);
 
+  const handleUser = useCallback(
+    async (user) => {
+      dispatch(
+        setUser({
+          email: user.email,
+          name: user.displayName,
+          id: user.uid,
+        })
+      );
+      emailRef.current.value = "";
+      pwdRef.current.value = "";
+      setErrorMessage({ email: "", password: "", confirmPassword: "" }); // Clear errors/ Clear errors
+    },
+    [dispatch]
+  );
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -47,17 +71,14 @@ const LoginForm = ({ formType }) => {
     ) {
       setLoading(true);
       try {
-        if (formType === "signup") {
-          await createNewUser(emailRef.current.value, pwdRef.current.value);
-          emailRef.current.value = "";
-          pwdRef.current.value = "";
-          confirmPwdRef.current.value = "";
-          setErrorMessage({ email: "", password: "", confirmPassword: "" }); // Clear errors
-        } else {
-          await signInUser(emailRef.current.value, pwdRef.current.value);
-          emailRef.current.value = "";
-          pwdRef.current.value = "";
-          setErrorMessage({ email: "", password: "", confirmPassword: "" }); // Clear errors
+        const user =
+          formType === "signup"
+            ? await createNewUser(emailRef.current.value, pwdRef.current.value)
+            : await signInUser(emailRef.current.value, pwdRef.current.value);
+
+        if (user) {
+          handleUser(user);
+          navigate("/dashboard");
         }
       } catch (error) {
         console.error("Error creating user:", error.message);
