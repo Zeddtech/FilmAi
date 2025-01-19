@@ -35,7 +35,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App bg-[#1e1e1e] h-full ">
       <RouterProvider router={PageRoutes} />
     </div>
   );
