@@ -1,11 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
+import Banner from "../components/Banner";
 
 const Dashboard = () => {
   return (
     <div>
       <Header/>
+      <Banner/>
       <h1>Dashboard</h1>
       <p>Welcome to the dashboard!</p>
       <Link to={"/details"}>details</Link>
