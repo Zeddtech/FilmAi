@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/img/logo.png";
 import { IoMdSearch } from "react-icons/io";
@@ -15,7 +15,7 @@ const useToggle = (initialState = false) => {
 
 const NavLinks = () => (
   <>
-    <Link to="/" className="hover:text-gray-300 pt-3">
+    <Link to="/" className="hover:text-gray-300 pt-3 md:pt-0">
       Home
     </Link>
     <Link to="/tv-shows" className="hover:text-gray-300">
@@ -27,7 +27,7 @@ const NavLinks = () => (
     <Link to="/new-popular" className="hover:text-gray-300">
       New & Popular
     </Link>
-    <Link to="/my-list" className="hover:text-gray-300 pb-3">
+    <Link to="/my-list" className="hover:text-gray-300 pb-3 md:pb-0">
       My List
     </Link>
   </>
@@ -38,15 +38,36 @@ const Header = () => {
   const [openProfile, toggleProfile, setProfileFalse] = useToggle(false);
   const [openNotification, toggleNotification, setNotificationFalse] =
     useToggle(false);
+  const [navbar, setNavbar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setNavbar(true);
+      } else {
+        setNavbar(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
   return (
-    <header className="text-white px-4 py-6 flex justify-between items-center sticky top-0 bg-gray-700 z-50">
-      <div className="flex items-center">
+    <header
+      className={`text-white px-4 py-6 flex justify-between items-center sticky top-0 z-50 w-full ${
+        navbar ? "bg-[#0F0F0F]" : "bg-transparent"
+      }  md:justify-around`}
+    >
+      <div className="flex items-center md:gap-20 ">
         <img src={logo} alt="Logo" className="h-8 mr-4" />
         <nav className="space-x-4 text-sm font-bold z-10">
           <div
-            className={`navCon flex-col absolute flex inset-x-0 mt-10 px-5 gap-3 rounded-md bg-gray-700 overflow-hidden transition-[max-height] duration-300 ease-in-out ${
+            className={`navCon flex-col absolute flex inset-x-0 mt-10 px-5 gap-3 rounded-md bg-[#0f0f0f] overflow-hidden transition-[max-height] duration-300 ease-in-out ${
               openMenu ? "max-h-96" : "max-h-0"
-            } md:relative md:flex-row md:mt-0 md:bg-transparent md:max-h-96`}
+            } md:relative md:flex-row md:mt-0 md:bg-transparent md:max-h-96  border-[#1f1f1f] md:border-[3px] md:bg-[#0f0f0f] md:justify-center md:items-center md:px-8 md:py-4 `}
           >
             <NavLinks />
           </div>
