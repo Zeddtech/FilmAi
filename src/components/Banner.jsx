@@ -4,9 +4,9 @@ import { IoPlay } from "react-icons/io5";
 
 function Banner() {
   return (
-    <div className="-mt-[150px]">
-      <div className="relative bg-center bg-cover bg-no-repeat h-[400px] md:h-[425px] lg:h-[625px] xl:h-[725px] 2xl:h-[850px] bg-hero">
-        <div className="w-full h-full bg-gradient-to-t from-[#1e1e1e] from-10% to-[#00000099] flex flex-col justify-end items-center text-center px-4 md:px-10">
+    <div className="-mt-[110px]">
+      <div className="relative bg-center bg-cover bg-no-repeat h-[450px] md:h-[500px] lg:h-[625px] xl:h-[725px] 2xl:h-[850px] bg-hero">
+        <div className="w-full h-full bg-gradient-to-t from-[#1e1e1e] from-10% to-[#00000099] flex flex-col justify-end items-center text-center px-4 md:px-10 ">
           <img
             src={playLogo}
             alt="Play Logo"

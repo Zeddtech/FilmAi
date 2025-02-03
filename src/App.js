@@ -35,7 +35,7 @@ function App() {
   }
 
   return (
-    <div className="App bg-[#1e1e1e] h-full ">
+    <div className="App bg-[#1e1e1e] h-full min-w-[348px] ">
       <RouterProvider router={PageRoutes} />
     </div>
   );
